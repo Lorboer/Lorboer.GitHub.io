@@ -33,7 +33,14 @@ body {
     outline: none;
 }
 
+.select-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
 #parser-select {
+    flex: 1;
     width: 100%;
     padding: 10px;
     font-size: 16px;
@@ -292,25 +299,18 @@ h1:hover:after, h2:hover:after {
 }
 
 /* 刷新按钮样式 */
-.title-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
 .refresh-btn {
+    padding: 10px 15px;
     background: #007bff;
     color: white;
     border: none;
-    padding: 8px 15px;
-    border-radius: 20px;
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 5px;
     transition: all 0.3s ease;
+    height: 42px; /* 保持与select相同高度 */
 }
 
 .refresh-btn:hover {
@@ -329,4 +329,104 @@ h1:hover:after, h2:hover:after {
 
 .refresh-btn.rotating i {
     animation: rotate 1s linear infinite;
+}
+
+/* 平台列表样式 */
+.platforms-container {
+    margin: 30px 0;
+    text-align: center;
+}
+
+.platforms-container h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.platforms-container h3:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #007bff, transparent);
+}
+
+.platform-list {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.platform-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #666;
+    padding: 15px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    min-width: 100px;
+}
+
+.platform-item:hover {
+    background: rgba(0,123,255,0.1);
+    transform: translateY(-5px);
+    color: #007bff;
+}
+
+.platform-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.platform-icon.iqiyi {
+    background-image: url('https://www.iqiyi.com/favicon.ico');
+}
+
+.platform-icon.qq {
+    background-image: url('https://v.qq.com/favicon.ico');
+}
+
+.platform-icon.mgtv {
+    background-image: url('https://www.mgtv.com/favicon.ico');
+}
+
+.platform-icon.bilibili {
+    background-image: url('https://s1.aigei.com/src/img/png/73/73c706890d074fb3ba1e4db69c7b9542.png?imageMogr2/auto-orient/thumbnail/!282x282r/gravity/Center/crop/282x282/quality/85/%7CimageView2/2/w/282&e=2051020800&token=P7S2Xpzfz11vAkASLTkfHN7Fw-oOZBecqeJaxypL:vXUx7We4RaHHT5R52GdqbnWZq84=');
+}
+
+.platform-icon.youku {
+    background-image: url('https://img.alicdn.com/imgextra/i2/O1CN01BeAcgL1ywY0G5nSn8_!!6000000006643-2-tps-195-195.png');
+}
+
+.platform-item span {
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+    .platform-list {
+        gap: 10px;
+    }
+
+    .platform-item {
+        padding: 10px;
+        min-width: 80px;
+    }
+
+    .platform-icon {
+        width: 30px;
+        height: 30px;
+    }
 }

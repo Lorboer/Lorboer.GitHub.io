@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>视频解析网站</title>
+    <title>GuliGuli视频播放</title>
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- 添加默认解析接口数据 -->
@@ -19,17 +19,17 @@
         <div class="usage">
             <h4>使用方法：</h4>
             <ol>
-                <li>复制需要解析的视频链接</li>
+                <li>去视频平台复制需要的视频链接（例如：腾讯、爱奇艺、优酷、乐视、芒果、搜狐等）</li>
                 <li>将链接粘贴到输入框中</li>
-                <li>从下拉菜单选择解析接口</li>
-                <li>点击"解析播放"按钮</li>
+                <li>从下拉菜单选择接口</li>
+                <li>点击"播放"按钮</li>
                 <li>等待视频加载完成即可观看</li>
             </ol>
         </div>
     </div>
 
     <div class="container">
-        <h1>视频解析工具</h1>
+        <h1>GuliGuli视频播放</h1>
 
         <!-- 用户输入区域 -->
         <div class="input-group">
@@ -37,16 +37,20 @@
         </div>
         
         <!-- 解析接口选择 -->
-        <div class="input-group">
+        <div class="input-group select-container">
             <select id="parser-select">
-                <option value="" disabled selected>请选择解析接口</option>
+                <option value="" disabled selected>请选择接口</option>
                 <!-- 动态填充选项 -->
             </select>
+            <button id="refresh-btn" class="refresh-btn">
+                <i class="fas fa-sync-alt"></i>
+                刷新状态
+            </button>
         </div>
         
         <!-- 解析按钮 -->
         <div class="input-group">
-            <button id="parse-btn">解析播放</button>
+            <button id="parse-btn">播放</button>
         </div>
         
         <!-- 添加加载动画容器 -->
@@ -54,15 +58,34 @@
         
         <!-- 视频播放容器 -->
         <div id="video-container"></div>
-        
-        <!-- 修改解析接口列表标题部分 -->
-        <div class="title-container">
-            <h2>检测解析接口</h2>
-            <button id="refresh-btn" class="refresh-btn">
-                <i class="fas fa-sync-alt"></i>
-                刷新状态
-            </button>
+
+        <!-- 支持的平台列表 -->
+        <div class="platforms-container">
+            <h3>支持的视频平台</h3>
+            <div class="platform-list">
+                <a href="https://www.iqiyi.com" target="_blank" class="platform-item">
+                    <i class="platform-icon iqiyi"></i>
+                    <span>爱奇艺</span>
+                </a>
+                <a href="https://v.qq.com" target="_blank" class="platform-item">
+                    <i class="platform-icon qq"></i>
+                    <span>腾讯视频</span>
+                </a>
+                <a href="https://www.mgtv.com" target="_blank" class="platform-item">
+                    <i class="platform-icon mgtv"></i>
+                    <span>芒果TV</span>
+                </a>
+                <a href="https://www.bilibili.com" target="_blank" class="platform-item">
+                    <i class="platform-icon bilibili"></i>
+                    <span>哔哩哔哩</span>
+                </a>
+                <a href="https://www.youku.com" target="_blank" class="platform-item">
+                    <i class="platform-icon youku"></i>
+                    <span>优酷</span>
+                </a>
+            </div>
         </div>
+
         <div id="links-container"></div>
         <script src="assets/app.js"></script>
     </div>
