@@ -38,8 +38,6 @@ jobs:
       - name: 安装 Python 依赖
         run: |
           pip install requests BeautifulSoup4  # 安装爬虫脚本需要的库（按需修改）
-      - name: 清理旧文件
-        run: rm -rf public/assets/*  # 清理旧的静态资源
       - name: 执行爬虫脚本
         run: |
           python scripts/crawler.py  # 运行爬虫生成 links.json
