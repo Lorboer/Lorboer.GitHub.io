@@ -1,0 +1,98 @@
+body {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.input-group {
+    margin: 15px 0;
+}
+
+#video-url {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+}
+
+#parser-select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+}
+
+#parse-btn {
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#parse-btn:hover {
+    background: #0056b3;
+}
+
+#video-container {
+    margin: 20px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#links-container div {
+    margin: 10px 0;
+}
+
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.api-card {
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    position: relative;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.api-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.status-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ccc;
+}
+
+.status-indicator.active {
+    background-color: #4CAF50;
+}
+
+.status-indicator.inactive {
+    background-color: #f44336;
+}
+
+.status-text {
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.api-card h3 {
+    margin: 0;
+    padding-right: 20px;
+    font-size: 16px;
+}
