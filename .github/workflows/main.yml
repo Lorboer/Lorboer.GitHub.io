@@ -46,7 +46,7 @@ jobs:
       # ----------------------------------------------------------
       - name: 查看文件
         run: |
-          ls /public/
+          ls public
       - name: 配置 Pages
         uses: actions/configure-pages@v5  # 初始化 Pages 设置
 
