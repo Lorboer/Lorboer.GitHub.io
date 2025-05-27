@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>视频解析网站</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <!-- 添加默认解析接口数据 -->
+    </script>
+</head>
+<body>
+    <h1>视频解析工具</h1>
+
+    <!-- 用户输入区域 -->
+    <div class="input-group">
+        <input type="text" id="video-url" placeholder="粘贴视频地址（如 https://www.youtube.com/watch?v=xxx）">
+    </div>
+    
+    <!-- 解析接口选择 -->
+    <div class="input-group">
+        <select id="parser-select">
+            <option value="" disabled selected>请选择解析接口</option>
+            <!-- 动态填充选项 -->
+        </select>
+    </div>
+    
+    <!-- 解析按钮 -->
+    <div class="input-group">
+        <button id="parse-btn">解析播放</button>
+    </div>
+    
+    <!-- 视频播放容器 -->
+    <div id="video-container"></div>
+    
+    <!-- 解析接口列表 -->
+    <h2>检测解析接口</h2>
+    <div id="links-container"></div>
+    <script src="assets/app.js"></script>
+</body>
+</html>
