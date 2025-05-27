@@ -3,22 +3,49 @@ body {
     margin: 0 auto;
     padding: 20px;
     font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
 }
 
 .input-group {
     margin: 15px 0;
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+.input-group:hover {
+    transform: translateY(-2px);
 }
 
 #video-url {
     width: 100%;
     padding: 10px;
     font-size: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+#video-url:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+    outline: none;
 }
 
 #parser-select {
     width: 100%;
     padding: 10px;
     font-size: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+#parser-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
 }
 
 #parse-btn {
@@ -29,17 +56,51 @@ body {
     border: none;
     cursor: pointer;
     font-size: 16px;
+    border-radius: 8px;
+    transform: scale(1);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 #parse-btn:hover {
     background: #0056b3;
+    transform: scale(1.02);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+}
+
+#parse-btn:active {
+    transform: scale(0.98);
 }
 
 #video-container {
     margin: 20px 0;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 8px;
     overflow: hidden;
+    min-height: 500px;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+#video-container.empty {
+    color: #666;
+    font-size: 1.2em;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#video-container.empty i {
+    font-size: 3em;
+    color: #999;
+}
+
+#video-container iframe {
+    width: 100%;
+    height: 500px;
+    border: none;
 }
 
 #links-container div {
@@ -62,10 +123,14 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transform: translateY(0);
 }
 
 .api-card:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transform: translateY(-5px);
 }
 
 .status-indicator {
@@ -95,4 +160,173 @@ body {
     margin: 0;
     padding-right: 20px;
     font-size: 16px;
+}
+
+/* 新增加载动画 */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+/* 标题动画 */
+h1, h2 {
+    text-align: center;
+    color: #2c3e50;
+    position: relative;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+h1:after, h2:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background: #007bff;
+    transition: width 0.3s ease;
+}
+
+h1:hover:after, h2:hover:after {
+    width: 100px;
+}
+
+/* 响应式设计优化 */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    
+    .card-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 关于按钮样式 */
+.about-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 8px 15px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #007bff;
+    border-radius: 20px;
+    color: #007bff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.about-btn:hover {
+    background: #007bff;
+    color: white;
+}
+
+/* 浮窗样式 */
+.about-popup {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    width: 300px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 99;
+}
+
+.about-btn:hover + .about-popup,
+.about-popup:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.about-popup h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 8px;
+}
+
+.about-popup p {
+    margin: 10px 0;
+    line-height: 1.5;
+    color: #666;
+}
+
+.about-popup .contact-info {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.about-popup .usage {
+    margin-top: 15px;
+}
+
+.about-popup .usage ol {
+    padding-left: 20px;
+}
+
+.about-popup .usage li {
+    margin: 5px 0;
+    color: #666;
+}
+
+/* 刷新按钮样式 */
+.title-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.refresh-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.refresh-btn:hover {
+    background: #0056b3;
+    transform: scale(1.05);
+}
+
+.refresh-btn:active {
+    transform: scale(0.95);
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.refresh-btn.rotating i {
+    animation: rotate 1s linear infinite;
 }

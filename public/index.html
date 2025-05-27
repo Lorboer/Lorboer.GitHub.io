@@ -3,36 +3,68 @@
 <head>
     <title>视频解析网站</title>
     <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- 添加默认解析接口数据 -->
     </script>
 </head>
 <body>
-    <h1>视频解析工具</h1>
+    <!-- 添加关于按钮和浮窗 -->
+    <button class="about-btn">关于</button>
+    <div class="about-popup">
+        <h3>关于本站</h3>
+        <div class="contact-info">
+            <p><strong>作者：</strong>Lorcan</p>
+            <p><strong>邮箱：</strong>3482058089@qq.com</p>
+        </div>
+        <div class="usage">
+            <h4>使用方法：</h4>
+            <ol>
+                <li>复制需要解析的视频链接</li>
+                <li>将链接粘贴到输入框中</li>
+                <li>从下拉菜单选择解析接口</li>
+                <li>点击"解析播放"按钮</li>
+                <li>等待视频加载完成即可观看</li>
+            </ol>
+        </div>
+    </div>
 
-    <!-- 用户输入区域 -->
-    <div class="input-group">
-        <input type="text" id="video-url" placeholder="粘贴视频地址（如 https://www.youtube.com/watch?v=xxx）">
+    <div class="container">
+        <h1>视频解析工具</h1>
+
+        <!-- 用户输入区域 -->
+        <div class="input-group">
+            <input type="text" id="video-url" placeholder="粘贴视频地址（如 https://v.qq.com/x/cover/t8kznq0xbqluv0m/g00340hnnny.html）">
+        </div>
+        
+        <!-- 解析接口选择 -->
+        <div class="input-group">
+            <select id="parser-select">
+                <option value="" disabled selected>请选择解析接口</option>
+                <!-- 动态填充选项 -->
+            </select>
+        </div>
+        
+        <!-- 解析按钮 -->
+        <div class="input-group">
+            <button id="parse-btn">解析播放</button>
+        </div>
+        
+        <!-- 添加加载动画容器 -->
+        <div id="loading" class="loading" style="display: none;"></div>
+        
+        <!-- 视频播放容器 -->
+        <div id="video-container"></div>
+        
+        <!-- 修改解析接口列表标题部分 -->
+        <div class="title-container">
+            <h2>检测解析接口</h2>
+            <button id="refresh-btn" class="refresh-btn">
+                <i class="fas fa-sync-alt"></i>
+                刷新状态
+            </button>
+        </div>
+        <div id="links-container"></div>
+        <script src="assets/app.js"></script>
     </div>
-    
-    <!-- 解析接口选择 -->
-    <div class="input-group">
-        <select id="parser-select">
-            <option value="" disabled selected>请选择解析接口</option>
-            <!-- 动态填充选项 -->
-        </select>
-    </div>
-    
-    <!-- 解析按钮 -->
-    <div class="input-group">
-        <button id="parse-btn">解析播放</button>
-    </div>
-    
-    <!-- 视频播放容器 -->
-    <div id="video-container"></div>
-    
-    <!-- 解析接口列表 -->
-    <h2>检测解析接口</h2>
-    <div id="links-container"></div>
-    <script src="assets/app.js"></script>
 </body>
 </html>

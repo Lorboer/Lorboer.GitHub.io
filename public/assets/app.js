@@ -49,10 +49,35 @@ function updateCardStatus(card, isActive) {
     statusText.style.color = isActive ? '#4CAF50' : '#f44336';
 }
 
+// 添加刷新按钮相关代码
+let apiData = []; // 存储接口数据
+
+// 更新检测接口状态的函数
+async function refreshApiStatus() {
+    const refreshBtn = document.getElementById('refresh-btn');
+    const container = document.getElementById('links-container');
+    
+    // 添加旋转动画
+    refreshBtn.classList.add('rotating');
+    
+    // 检查每个接口的状态
+    const cards = container.querySelectorAll('.api-card');
+    for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        const url = apiData[i].url;
+        const isActive = await checkApiStatus(url);
+        updateCardStatus(card, isActive);
+    }
+    
+    // 移除旋转动画
+    refreshBtn.classList.remove('rotating');
+}
+
 // 更新接口展示部分的代码
 fetch('links.json')
     .then(response => response.json())
-    .then(async data => {
+    .then(data => {
+        apiData = data; // 保存接口数据
         const container = document.getElementById('links-container');
         const select = document.getElementById('parser-select');
         
@@ -61,7 +86,7 @@ fetch('links.json')
         select.innerHTML = '<option value="" disabled selected>请选择解析接口</option>';
         
         // 动态填充接口列表和选择框
-        for (const item of data) {
+        data.forEach(item => {
             // 创建卡片
             const card = document.createElement('div');
             card.className = 'api-card';
@@ -78,20 +103,32 @@ fetch('links.json')
             card.appendChild(title);
             container.appendChild(card);
             
-            // 检查接口状态
-            const isActive = await checkApiStatus(item.url);
-            statusIndicator.classList.add(isActive ? 'active' : 'inactive');
-            
             // 添加到下拉选择框
             const option = document.createElement('option');
             option.value = item.url;
             option.textContent = item.title;
             select.appendChild(option);
-        }
+        });
     })
     .catch(error => console.error('加载接口失败:', error));
 
-// 解析按钮点击事件
+// 添加刷新按钮点击事件
+document.getElementById('refresh-btn').addEventListener('click', refreshApiStatus);
+
+// 初始化视频容器的默认显示
+function initVideoContainer() {
+    const videoContainer = document.getElementById('video-container');
+    videoContainer.className = 'empty';
+    videoContainer.innerHTML = `
+        <i class="fas fa-play-circle"></i>
+        <div>请在上方输入视频地址并选择解析接口</div>
+    `;
+}
+
+// 在页面加载时初始化视频容器
+document.addEventListener('DOMContentLoaded', initVideoContainer);
+
+// 更新解析按钮点击事件
 document.getElementById('parse-btn').addEventListener('click', () => {
     const videoUrl = document.getElementById('video-url').value;
     const parserUrl = document.getElementById('parser-select').value;
@@ -102,16 +139,14 @@ document.getElementById('parse-btn').addEventListener('click', () => {
         return;
     }
     
-    // 构建播放页地址（假设解析接口需要拼接视频地址）
-    // 例如：解析接口格式为 https://parse.example?url=VIDEO_URL
+    // 构建播放页地址
     const playUrl = `${parserUrl}?url=${encodeURIComponent(videoUrl)}`;
     
-    // 嵌入视频播放器
+    // 移除empty类并嵌入视频播放器
+    videoContainer.className = '';
     videoContainer.innerHTML = `
         <iframe 
             src="${playUrl}" 
-            width="100%" 
-            height="500" 
             frameborder="0" 
             allowfullscreen
         ></iframe>
