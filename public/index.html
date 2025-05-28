@@ -1,93 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>GuliGuli视频播放</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <!-- 移除默认样式表引入，由 device.js 动态加载 -->
-    <script src="assets/device.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频解析站 - Lorcan</title>
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <!-- 添加关于按钮和浮窗 -->
-    <button class="about-btn">关于</button>
-    <div class="about-popup">
-        <h3>关于本站</h3>
-        <div class="contact-info">
-            <p><strong>作者：</strong>Lorcan</p>
-            <p><strong>邮箱：</strong>3482058089@qq.com</p>
-        </div>
-        <div class="usage">
-            <h4>使用方法：</h4>
-            <ol>
-                <li>去视频平台复制需要的视频链接（例如：腾讯、爱奇艺、优酷、乐视、芒果、搜狐等）</li>
-                <li>将链接粘贴到输入框中</li>
-                <li>从下拉菜单选择接口</li>
-                <li>点击"播放"按钮</li>
-                <li>等待视频加载完成即可观看</li>
-            </ol>
-        </div>
+    <div id="about-btn" class="floating-about-btn">
+        <span>关于</span>
     </div>
-
+    
     <div class="container">
-        <h1>GuliGuli视频播放</h1>
-
-        <!-- 用户输入区域 -->
-        <div class="input-group">
-            <input type="text" id="video-url" placeholder="粘贴视频地址（如 https://v.qq.com/x/cover/t8kznq0xbqluv0m/g00340hnnny.html）">
-        </div>
+        <header>
+            <h1>视频解析站</h1>
+        </header>
         
-        <!-- 解析接口选择 -->
-        <div class="input-group select-container">
-            <select id="parser-select">
-                <option value="" disabled selected>请选择接口</option>
-                <!-- 动态填充选项 -->
-            </select>
-            <button id="refresh-btn" class="refresh-btn">
-                <i class="fas fa-sync-alt"></i>
-                刷新状态
-            </button>
-        </div>
+        <main>
+            <div class="video-container">
+                <iframe id="video-player" allowfullscreen></iframe>
+            </div>
+            
+            <div class="input-container">
+                <input type="text" id="video-url" placeholder="请输入需要解析的视频链接...">
+                <select id="interface-select">
+                    <!-- 接口列表将由JavaScript动态生成 -->
+                </select>
+                <button id="parse-btn">解析</button>
+                <button id="refresh-btn">刷新接口状态</button>
+            </div>
+            
+            <div class="status-container">
+                <h3>接口状态</h3>
+                <div id="status-list"></div>
+            </div>
+            
+            <div class="platforms-container">
+                <h3>支持平台</h3>
+                <div class="platforms-list">
+                    <a href="https://www.iqiyi.com/" target="_blank" class="platform-item" title="访问爱奇艺官网">
+                        <img src="https://www.iqiyi.com/logo.png" alt="爱奇艺" class="platform-icon">
+                        <span>爱奇艺</span>
+                    </a>
+                    <a href="https://v.qq.com/" target="_blank" class="platform-item" title="访问腾讯视频官网">
+                        <img src="https://v.qq.com/favicon.ico" alt="腾讯视频" class="platform-icon">
+                        <span>腾讯视频</span>
+                    </a>
+                    <a href="https://www.mgtv.com/" target="_blank" class="platform-item" title="访问芒果TV官网">
+                        <img src="https://www.mgtv.com/favicon.ico" alt="芒果TV" class="platform-icon">
+                        <span>芒果TV</span>
+                    </a>
+                    <a href="https://www.bilibili.com/" target="_blank" class="platform-item" title="访问哔哩哔哩官网">
+                        <img src="data:image/vnd.microsoft.icon;base64,AAABAAEAICAAAAEAIACoEAAAFgAAACgAAAAgAAAAQAAAAAEAIAAAAAAAABAAABMLAAATCwAAAAAAAAAAAAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A1qEAANahAADWoQAG1qEAb9ahAMvWoQD01qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD01qEAy9ahAG/WoQAG1qEAANahAADWoQAA1qEAG9ahAM/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahANDWoQAb1qEAANahAAfWoQDQ1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahANHWoQAH1qEAbtahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAG7WoQDH1qEA/9ahAP/WoQD/1qEAtdahABjWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahABvWoQC11qEA/9ahAP/WoQD/1qEAx9ahAPnWoQD/1qEA/9ahAP/WoQAZ1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahABjWoQD/1qEA/9ahAP/WoQDz1qEA/9ahAP/WoQD/1qEA/9ahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEAANahAADWoQAA1qEAANahAErWoQDn1qEA5NahAErWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAErWoQDn1qEA5NahAErWoQAA1qEAANahAADWoQAA1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQAA1qEAANahAADWoQAA1qEA5tahAP/WoQD/1qEA59ahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEA5tahAP/WoQD/1qEA59ahAADWoQAA1qEAANahAADWoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAADWoQAA1qEAANahAADWoQD/1qEA/9ahAP/WoQD/1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQD/1qEA/9ahAP/WoQD/1qEAANahAADWoQAA1qEAANahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEAANahAADWoQAA1qEAANahAP/WoQD/1qEA/9ahAP/WoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAP/WoQD/1qEA/9ahAP/WoQAA1qEAANahAADWoQAA1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQAA1qEAANahAADWoQAA1qEA5tahAP/WoQD/1qEA5tahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEA5tahAP/WoQD/1qEA5tahAADWoQAA1qEAANahAADWoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAADWoQAA1qEAANahAADWoQBJ1qEA5tahAObWoQBJ1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQBJ1qEA5tahAObWoQBJ1qEAANahAADWoQAA1qEAANahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQD/1qEA/9ahAP/WoQD/1qEA+dahAP/WoQD/1qEA/9ahABnWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAGdahAP/WoQD/1qEA/9ahAPjWoQDH1qEA/9ahAP/WoQD/1qEAttahABnWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahABnWoQC21qEA/9ahAP/WoQD/1qEAx9ahAG3WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQBt1qEABtahAM/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA0NahAAfWoQAA1qEAG9ahAM/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAM/WoQAb1qEAANahAADWoQAA1qEABtahAG7WoQDH1qEA89ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA/9ahAP/WoQD/1qEA89ahAMfWoQBu1qEABtahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEADtahAMXWoQD/1qEA/9ahAP/WoQD/1qEAxdahAA/WoQAA1qEAANahAADWoQAA1qEADtahAMXWoQD/1qEA/9ahAP/WoQD/1qEAxdahAA/WoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAAbWoQDF1qEA/9ahAP/WoQD/1qEA/9ahAMXWoQAP1qEAANahAADWoQAA1qEAANahAADWoQAA1qEADtahAMXWoQD/1qEA/9ahAP/WoQD/1qEAxdahAAbWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAYtahAP/WoQD/1qEA/9ahAP/WoQDF1qEADtahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEADtahAMXWoQD/1qEA/9ahAP/WoQD/1qEAY9ahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQBf1qEA/9ahAP/WoQD/1qEAxdahAA7WoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEADtahAMXWoQD/1qEA/9ahAP/WoQBf1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAATWoQCg1qEA6tahAKjWoQAO1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEAANahAADWoQAA1qEADtahAKjWoQDr1qEAoNahAATWoQAA1qEAANahAADWoQAA1qEAAP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A///////////AAAADgAAAAQAAAAAAAAAAA///wAf//+AP///wD///8A////AP///wDw/w8A8P8PAPD/DwDw/w8A8P8PAPD/DwD///8A////AH///gA///wAAAAAAAAAAAgAAAAcAAAAP8A8A/+AfgH/gP8B/4H/gf+D/8H/////8=" alt="哔哩哔哩" class="platform-icon">
+                        <span>哔哩哔哩</span>
+                    </a>
+                    <a href="https://www.youku.com/" target="_blank" class="platform-item" title="访问优酷官网">
+                        <img src="https://img.alicdn.com/imgextra/i2/O1CN01BeAcgL1ywY0G5nSn8_!!6000000006643-2-tps-195-195.png" alt="优酷" class="platform-icon">
+                        <span>优酷</span>
+                    </a>
+                </div>
+            </div>
+        </main>
         
-        <!-- 解析按钮 -->
-        <div class="input-group">
-            <button id="parse-btn">播放</button>
-        </div>
-        
-        <!-- 添加加载动画容器 -->
-        <div id="loading" class="loading" style="display: none;"></div>
-        
-        <!-- 视频播放容器 -->
-        <div id="video-container"></div>
-
-        <!-- 支持的平台列表 -->
-        <div class="platforms-container">
-            <h3>支持的视频平台</h3>
-            <div class="platform-list">
-                <a href="https://www.iqiyi.com" target="_blank" class="platform-item">
-                    <i class="platform-icon iqiyi"></i>
-                    <span>爱奇艺</span>
-                </a>
-                <a href="https://v.qq.com" target="_blank" class="platform-item">
-                    <i class="platform-icon qq"></i>
-                    <span>腾讯视频</span>
-                </a>
-                <a href="https://www.mgtv.com" target="_blank" class="platform-item">
-                    <i class="platform-icon mgtv"></i>
-                    <span>芒果TV</span>
-                </a>
-                <a href="https://www.bilibili.com" target="_blank" class="platform-item">
-                    <i class="platform-icon bilibili"></i>
-                    <span>哔哩哔哩</span>
-                </a>
-                <a href="https://www.youku.com" target="_blank" class="platform-item">
-                    <i class="platform-icon youku"></i>
-                    <span>优酷</span>
-                </a>
+        <div id="about-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>关于</h2>
+                <div class="about-info">
+                    <h3>作者信息</h3>
+                    <p>作者: Lorcan</p>
+                    <p>邮箱: lorcan0016@outlook.com</p>
+                    
+                    <h3>使用方法</h3>
+                    <ol>
+                        <li>复制视频平台中的视频链接</li>
+                        <li>粘贴到输入框中</li>
+                        <li>选择一个解析接口</li>
+                        <li>点击解析按钮</li>
+                    </ol>
+                </div>
             </div>
         </div>
-
-        <div id="links-container"></div>
-        <script src="assets/app.js"></script>
     </div>
+    
+    <script src="assets/app.js"></script>
 </body>
 </html>
