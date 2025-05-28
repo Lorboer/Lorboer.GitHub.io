@@ -203,6 +203,7 @@ main {
     animation: fadeIn 0.8s ease-out 0.2s both;
     transition: all var(--transition-speed);
     border: 2px solid var(--card-bg);
+    overflow: hidden;
 }
 
 .video-container:hover {
@@ -896,4 +897,68 @@ button:active {
 
 .mobile-device .platforms-container {
     padding: 20px;
+}
+
+/* 免责声明样式 */
+.disclaimer-section {
+    margin-top: 20px;
+    padding: 25px;
+    background-color: var(--card-bg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    animation: fadeIn 0.8s ease-out 1s both;
+    position: relative;
+    overflow: hidden;
+}
+
+.disclaimer-section::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(135deg, #f05d5e 0%, #e84a5f 100%);
+    border-radius: var(--radius-sm);
+}
+
+.disclaimer-content {
+    text-align: center;
+}
+
+.disclaimer-content h3 {
+    margin-bottom: 15px;
+    color: var(--text-color);
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.disclaimer-content h3::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: #e84a5f;
+    bottom: 0;
+    left: 0;
+    border-radius: var(--radius-sm);
+}
+
+.disclaimer-content p {
+    color: var(--text-light);
+    line-height: 1.8;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* 移动设备免责声明样式 */
+.mobile-device .disclaimer-section {
+    padding: 20px;
+}
+
+.mobile-device .disclaimer-content p {
+    font-size: 12px;
 }

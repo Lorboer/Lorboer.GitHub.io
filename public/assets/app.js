@@ -1,229 +1,316 @@
+/**
+ * Guliguli视频解析应用
+ * 优化版本：提高性能，改进代码结构
+ */
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM Elements
-    const videoUrlInput = document.getElementById('video-url');
-    const interfaceSelect = document.getElementById('interface-select');
-    const parseBtn = document.getElementById('parse-btn');
-    const refreshBtn = document.getElementById('refresh-btn');
-    const aboutBtn = document.getElementById('about-btn');
-    const statusList = document.getElementById('status-list');
-    const videoPlayer = document.getElementById('video-player');
-    const modal = document.getElementById('about-modal');
-    const closeModal = document.querySelector('.close');
+    // 缓存DOM元素，避免重复查询
+    const elements = {
+        videoUrlInput: document.getElementById('video-url'),
+        interfaceSelect: document.getElementById('interface-select'),
+        parseBtn: document.getElementById('parse-btn'),
+        refreshBtn: document.getElementById('refresh-btn'),
+        statusList: document.getElementById('status-list'),
+        videoPlayer: document.getElementById('video-player'),
+        modal: document.getElementById('about-modal'),
+        closeModal: document.querySelector('.close'),
+        aboutBtn: document.getElementById('about-btn')
+    };
     
-    // Store interfaces and their status
-    let interfaces = [];
-    let interfaceStatus = {};
+    // 应用状态
+    const state = {
+        interfaces: [],
+        interfaceStatus: {}
+    };
     
-    // 初始显示信息
-    videoPlayer.srcdoc = `
-        <style>
-            body {
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                height: 100%;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                background-color: #000;
-                color: white;
-                font-family: Arial, sans-serif;
-                text-align: center;
-            }
-            .message {
-                padding: 20px;
-                max-width: 80%;
-            }
-            h3 {
-                margin-bottom: 20px;
-            }
-        </style>
-        <div class="message">
-            <h3>欢迎使用视频解析站</h3>
-            <p>请在下方输入框粘贴视频链接，选择解析接口后点击解析按钮</p>
-        </div>
-    `;
+    // 初始化应用
+    initApp();
     
-    // Fetch interfaces from JSON file
-    fetch('links.json')
-        .then(response => response.json())
-        .then(data => {
-            interfaces = data;
-            populateInterfaceSelect();
-        })
-        .catch(error => {
-            console.error('Error loading interfaces:', error);
+    /**
+     * 初始化应用
+     */
+    function initApp() {
+        loadInterfaces();
+        setupEventListeners();
+        checkDeviceType();
+    }
+    
+    /**
+     * 加载解析接口
+     */
+    function loadInterfaces() {
+        fetch('links.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                state.interfaces = data;
+                populateInterfaceSelect();
+            })
+            .catch(error => {
+                console.error('Error loading interfaces:', error);
+                showAlert('加载解析接口失败，请刷新页面重试');
+            });
+    }
+    
+    /**
+     * 设置事件监听器
+     */
+    function setupEventListeners() {
+        // 视频解析按钮
+        elements.parseBtn.addEventListener('click', parseVideo);
+        
+        // 回车键触发解析
+        elements.videoUrlInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') parseVideo();
         });
+        
+        // 刷新接口状态
+        elements.refreshBtn.addEventListener('click', () => {
+            elements.refreshBtn.classList.add('spinning');
+            checkAllInterfaceStatus();
+            
+            setTimeout(() => {
+                elements.refreshBtn.classList.remove('spinning');
+            }, 1000);
+        });
+        
+        // 关于模态框
+        elements.aboutBtn.addEventListener('click', () => {
+            elements.modal.style.display = 'block';
+            requestAnimationFrame(() => {
+                elements.modal.classList.add('show');
+            });
+        });
+        
+        elements.closeModal.addEventListener('click', closeModal);
+        
+        window.addEventListener('click', event => {
+            if (event.target === elements.modal) {
+                closeModal();
+            }
+        });
+        
+        // 输入框焦点效果
+        elements.videoUrlInput.addEventListener('focus', function() {
+            this.parentElement.classList.add('input-focused');
+        });
+        
+        elements.videoUrlInput.addEventListener('blur', function() {
+            this.parentElement.classList.remove('input-focused');
+        });
+        
+        // 按钮波纹效果
+        addRippleEffectToButtons();
+    }
     
-    // Populate interface select dropdown
+    /**
+     * 关闭模态框
+     */
+    function closeModal() {
+        elements.modal.classList.remove('show');
+        setTimeout(() => {
+            elements.modal.style.display = 'none';
+        }, 300);
+    }
+    
+    /**
+     * 填充接口选择下拉框
+     */
     function populateInterfaceSelect() {
+        const { interfaceSelect } = elements;
         interfaceSelect.innerHTML = '';
-        interfaces.forEach((item, index) => {
+        
+        const fragment = document.createDocumentFragment();
+        state.interfaces.forEach((item, index) => {
             const option = document.createElement('option');
             option.value = index;
             option.textContent = item.title;
-            interfaceSelect.appendChild(option);
+            fragment.appendChild(option);
         });
+        
+        interfaceSelect.appendChild(fragment);
     }
     
-    // Check status of a single interface
+    /**
+     * 检查单个接口状态
+     * @param {Object} interface 接口对象
+     * @param {number} index 接口索引
+     * @returns {Promise<boolean>} 接口是否在线
+     */
     function checkInterfaceStatus(interface, index) {
         return new Promise((resolve) => {
-            const statusItem = document.createElement('div');
-            statusItem.classList.add('status-item', 'status-checking');
-            statusItem.textContent = `${interface.title}: 检测中...`;
-            statusItem.id = `status-${index}`;
-            statusItem.style.animationDelay = `${index * 0.1}s`;
+            const statusItem = createStatusItem(interface, index);
             
-            // Add or update status item in the list
-            const existingItem = document.getElementById(`status-${index}`);
-            if (existingItem) {
-                statusList.replaceChild(statusItem, existingItem);
-            } else {
-                statusList.appendChild(statusItem);
-            }
-            
-            // 使用 fetch 来检测接口是否可访问
-            fetch(interface.url, { 
-                method: 'HEAD',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                timeout: 5000
-            })
-            .then(() => {
-                // 由于 no-cors 模式下无法确定具体状态，但能接收到响应意味着服务器存在
-                interfaceStatus[index] = true;
-                updateStatusDisplay(index, true);
-                resolve(true);
-            })
-            .catch(() => {
-                interfaceStatus[index] = false;
-                updateStatusDisplay(index, false);
-                resolve(false);
-            });
-            
-            // 设置超时
-            setTimeout(() => {
+            // 设置检测超时
+            const timeoutId = setTimeout(() => {
                 if (statusItem.classList.contains('status-checking')) {
-                    interfaceStatus[index] = false;
-                    updateStatusDisplay(index, false);
+                    updateInterfaceStatus(index, false);
                     resolve(false);
                 }
             }, 5000);
+            
+            // 检测接口可用性
+            fetch(interface.url, { 
+                method: 'HEAD',
+                mode: 'no-cors',
+                cache: 'no-cache'
+            })
+            .then(() => {
+                clearTimeout(timeoutId);
+                updateInterfaceStatus(index, true);
+                resolve(true);
+            })
+            .catch(() => {
+                clearTimeout(timeoutId);
+                updateInterfaceStatus(index, false);
+                resolve(false);
+            });
         });
     }
     
-    // Update the status display for an interface
+    /**
+     * 创建状态项
+     * @param {Object} interface 接口对象
+     * @param {number} index 接口索引
+     * @returns {HTMLElement} 状态项元素
+     */
+    function createStatusItem(interface, index) {
+        const statusItem = document.createElement('div');
+        statusItem.classList.add('status-item', 'status-checking');
+        statusItem.textContent = `${interface.title}: 检测中...`;
+        statusItem.id = `status-${index}`;
+        statusItem.style.animationDelay = `${index * 0.1}s`;
+        
+        const existingItem = document.getElementById(`status-${index}`);
+        if (existingItem) {
+            elements.statusList.replaceChild(statusItem, existingItem);
+        } else {
+            elements.statusList.appendChild(statusItem);
+        }
+        
+        return statusItem;
+    }
+    
+    /**
+     * 更新接口状态
+     * @param {number} index 接口索引
+     * @param {boolean} isOnline 接口是否在线
+     */
+    function updateInterfaceStatus(index, isOnline) {
+        state.interfaceStatus[index] = isOnline;
+        updateStatusDisplay(index, isOnline);
+    }
+    
+    /**
+     * 更新状态显示
+     * @param {number} index 接口索引
+     * @param {boolean} isOnline 接口是否在线
+     */
     function updateStatusDisplay(index, isOnline) {
         const statusItem = document.getElementById(`status-${index}`);
-        if (statusItem) {
-            statusItem.classList.remove('status-checking', 'status-online', 'status-offline');
-            if (isOnline) {
-                statusItem.classList.add('status-online');
-                statusItem.textContent = `${interfaces[index].title}: 在线`;
-            } else {
-                statusItem.classList.add('status-offline');
-                statusItem.textContent = `${interfaces[index].title}: 离线`;
-            }
+        if (!statusItem) return;
+        
+        statusItem.classList.remove('status-checking', 'status-online', 'status-offline');
+        
+        if (isOnline) {
+            statusItem.classList.add('status-online');
+            statusItem.textContent = `${state.interfaces[index].title}: 在线`;
+        } else {
+            statusItem.classList.add('status-offline');
+            statusItem.textContent = `${state.interfaces[index].title}: 离线`;
         }
     }
     
-    // Check all interface statuses
+    /**
+     * 检查所有接口状态
+     */
     function checkAllInterfaceStatus() {
-        statusList.innerHTML = '';
-        interfaces.forEach((interface, index) => {
+        elements.statusList.innerHTML = '';
+        state.interfaces.forEach((interface, index) => {
             checkInterfaceStatus(interface, index);
         });
     }
     
-    // Parse video with selected interface
+    /**
+     * 解析视频
+     */
     function parseVideo() {
-        const videoUrl = videoUrlInput.value.trim();
-        const selectedIndex = interfaceSelect.value;
+        const videoUrl = elements.videoUrlInput.value.trim();
+        const selectedIndex = elements.interfaceSelect.value;
         
+        // 验证输入
         if (!videoUrl) {
             showAlert('请输入视频链接');
             return;
         }
         
-        if (selectedIndex === undefined || !interfaces[selectedIndex]) {
+        if (selectedIndex === undefined || !state.interfaces[selectedIndex]) {
             showAlert('请选择一个解析接口');
             return;
         }
         
-        const parseUrl = interfaces[selectedIndex].url + videoUrl;
+        // 创建解析URL
+        const parseUrl = state.interfaces[selectedIndex].url + videoUrl;
         
-        // 添加视频加载动画
-        const videoContainer = document.querySelector('.video-container');
-        videoContainer.classList.add('loading');
+        // 加载视频
+        loadVideo(parseUrl);
+    }
+    
+    /**
+     * 加载视频
+     * @param {string} url 视频URL
+     */
+    function loadVideo(url) {
+        // 清除欢迎信息
+        elements.videoPlayer.removeAttribute('srcdoc');
         
-        // 使用iframe的srcdoc属性而不是直接设置src，避免自动播放问题
-        videoPlayer.onload = function() {
-            videoContainer.classList.remove('loading');
-        };
+        // 加载视频
+        elements.videoPlayer.src = url;
         
-        videoPlayer.onerror = function() {
-            videoContainer.classList.remove('loading');
-            showAlert('视频加载失败，请尝试其他接口');
+        // 尝试处理广告
+        elements.videoPlayer.onload = attemptHideAds;
+    }
+    
+    /**
+     * 尝试隐藏广告
+     */
+    function attemptHideAds() {
+        try {
+            const iframeDoc = elements.videoPlayer.contentDocument || 
+                             (elements.videoPlayer.contentWindow && elements.videoPlayer.contentWindow.document);
             
-            // 显示错误信息
-            videoPlayer.srcdoc = `
-                <style>
-                    body {
-                        margin: 0;
-                        padding: 0;
-                        width: 100%;
-                        height: 100%;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        background-color: #000;
-                        color: #e74c3c;
-                        font-family: Arial, sans-serif;
-                        text-align: center;
-                    }
-                    .message {
-                        padding: 20px;
-                        max-width: 80%;
-                    }
-                </style>
-                <div class="message">
-                    <h3>视频加载失败</h3>
-                    <p>请尝试其他解析接口或检查视频链接是否正确</p>
-                </div>
+            if (!iframeDoc) return;
+            
+            const styleTag = iframeDoc.createElement('style');
+            styleTag.textContent = `
+                #vfHw2, 
+                [id*="vfHw"], 
+                [style*="position:fixed"],
+                [style*="z-index:2147483647"],
+                [style*="rotate(-90deg)"],
+                [style*="background-color: red"] {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    pointer-events: none !important;
+                }
             `;
-        };
-        
-        // 直接设置src而不是srcdoc来加载外部视频
-        videoPlayer.src = parseUrl;
-        videoContainer.classList.remove('loading');
-        
-        // 保存到历史记录
-        saveToHistory(videoUrl, selectedIndex);
-    }
-    
-    // 保存解析历史
-    function saveToHistory(url, interfaceIndex) {
-        let history = JSON.parse(localStorage.getItem('videoParseHistory') || '[]');
-        
-        // 添加到历史记录，最多保存10条
-        history.unshift({
-            url: url,
-            interface: interfaceIndex,
-            timestamp: new Date().toISOString()
-        });
-        
-        // 限制历史记录数量
-        if (history.length > 10) {
-            history = history.slice(0, 10);
+            
+            iframeDoc.head.appendChild(styleTag);
+        } catch (e) {
+            // 跨域限制，无法访问iframe内容
+            console.log('无法访问iframe内容以隐藏广告元素');
         }
-        
-        localStorage.setItem('videoParseHistory', JSON.stringify(history));
     }
     
-    // 显示自定义提示
+    /**
+     * 显示提示消息
+     * @param {string} message 提示消息
+     */
     function showAlert(message) {
-        // 检查是否已存在提示框
         let alertBox = document.querySelector('.custom-alert');
         
         if (!alertBox) {
@@ -240,85 +327,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
     
-    // Event listeners
-    parseBtn.addEventListener('click', parseVideo);
-    
-    // 支持按回车键解析
-    videoUrlInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            parseVideo();
-        }
-    });
-    
-    refreshBtn.addEventListener('click', function() {
-        refreshBtn.classList.add('spinning');
-        checkAllInterfaceStatus();
-        
-        setTimeout(() => {
-            refreshBtn.classList.remove('spinning');
-        }, 1000);
-    });
-    
-    aboutBtn.addEventListener('click', function() {
-        modal.style.display = 'block';
-        // 使用setTimeout确保display:block已应用
-        setTimeout(() => {
-            modal.classList.add('show');
-        }, 10);
-    });
-    
-    closeModal.addEventListener('click', function() {
-        modal.classList.remove('show');
-        // 等待动画完成后隐藏模态框
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 300);
-    });
-    
-    window.addEventListener('click', function(event) {
-        if (event.target === modal) {
-            modal.classList.remove('show');
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
-        }
-    });
-    
-    // 添加设备检测
+    /**
+     * 检测设备类型
+     */
     function checkDeviceType() {
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         document.body.classList.add(isMobile ? 'mobile-device' : 'desktop-device');
     }
     
-    // 添加输入框焦点效果
-    videoUrlInput.addEventListener('focus', function() {
-        this.parentElement.classList.add('input-focused');
-    });
-    
-    videoUrlInput.addEventListener('blur', function() {
-        this.parentElement.classList.remove('input-focused');
-    });
-    
-    // 添加按钮点击波纹效果
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            const ripple = document.createElement('span');
-            ripple.classList.add('ripple');
-            this.appendChild(ripple);
-            
-            const x = e.clientX - this.getBoundingClientRect().left;
-            const y = e.clientY - this.getBoundingClientRect().top;
-            
-            ripple.style.left = `${x}px`;
-            ripple.style.top = `${y}px`;
-            
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
+    /**
+     * 添加按钮波纹效果
+     */
+    function addRippleEffectToButtons() {
+        const buttons = document.querySelectorAll('button');
+        
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                this.appendChild(ripple);
+                
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
         });
-    });
-    
-    // 初始化时检测设备类型
-    checkDeviceType();
+    }
 });
