@@ -270,41 +270,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // 加载视频
         elements.videoPlayer.src = url;
         
-        // 尝试处理广告
-        elements.videoPlayer.onload = attemptHideAds;
     }
-    
-    /**
-     * 尝试隐藏广告
-     */
-    function attemptHideAds() {
-        try {
-            const iframeDoc = elements.videoPlayer.contentDocument || 
-                             (elements.videoPlayer.contentWindow && elements.videoPlayer.contentWindow.document);
-            
-            if (!iframeDoc) return;
-            
-            const styleTag = iframeDoc.createElement('style');
-            styleTag.textContent = `
-                #vfHw2, 
-                [id*="vfHw"], 
-                [style*="position:fixed"],
-                [style*="z-index:2147483647"],
-                [style*="rotate(-90deg)"],
-                [style*="background-color: red"] {
-                    display: none !important;
-                    visibility: hidden !important;
-                    opacity: 0 !important;
-                    pointer-events: none !important;
-                }
-            `;
-            
-            iframeDoc.head.appendChild(styleTag);
-        } catch (e) {
-            // 跨域限制，无法访问iframe内容
-            console.log('无法访问iframe内容以隐藏广告元素');
-        }
-    }
+
     
     /**
      * 显示提示消息
